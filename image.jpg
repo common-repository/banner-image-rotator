@@ -1,0 +1,47 @@
+<?php
+/*
+  Plugin Name: Random Header Image
+  Plugin URI: http://www.onykage.com/forum/viewtopic.php?f=18&t=122
+  Description: a random header image generator
+  Author: Onykage
+  Version: 0.1.16
+  Author URI: http://www.onykage.com
+*/
+include 'config.inc';
+
+if(!is_file(".htaccess")) {
+	$createHT = fopen(".htaccess", "w");
+	fwrite($createHT, "ForceType application/x-httpd-php\n");
+	fwrite($createHT, "AddHandler application/x-httpd-php .jpg\n");
+	fclose($createHT);
+}
+
+header("Content-type: image/png");
+
+
+$i=0;
+if($dh = opendir(dirname(__FILE__))){
+	while(($file = readdir($dh)) != false){
+		if(substr($file,0,2) == 'bg'){
+			++$i;
+		}else{
+			//continue;
+		}
+	}
+}
+if($i>0){
+	$imgFile = "bg".rand(1, $i).".png";
+}else{
+	$imgFile = "header.png";
+}
+
+list($width_orig, $height_orig) = getimagesize($imgFile);
+$img_p = imagecreatetruecolor($imgx, $imgy);
+$img = imagecreatefrompng($imgFile);
+imagecopyresampled($img_p, $img, 0, 0, 0, 0, $imgx, $imgy, $width_orig, $height_orig);
+
+imagepng($img_p);
+imagedestroy($img);
+imagedestroy($img_p);
+
+?>
